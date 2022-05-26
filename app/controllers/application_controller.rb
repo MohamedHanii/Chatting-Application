@@ -13,13 +13,9 @@ class ApplicationController < ActionController::Base
   end
 
 
-  #def new
-  #end
-
   skip_before_action :verify_authenticity_token
   #Create New Application
   def create 
-    
     loop do
       @unique_identifier = SecureRandom.hex(5) # or whatever you chose like UUID tools
       break unless Application.exists?(:token => @unique_identifier)
@@ -29,17 +25,20 @@ class ApplicationController < ActionController::Base
   end
 
   
-  #def edit
-  #end
-
   # Update Application
   def update
-
+    app = Application.find_by(token: params[:token])
+    app.name = params[:name]
+    app.save
+    render json: app
   end
   
   #Delete Application
   def delete
-
+    app = Application.find_by(token: params[:token])
+    app.destroy
+    render json: app
   end
+
 
 end
