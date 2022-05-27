@@ -4,13 +4,14 @@ class ChatController < ActionController::Base
     # List All Application
     def list
         app = Application.find_by(token: params[:token])
-        render json: Chat.find_by(appId: app.id)
+        render json: app.chats.all
     end
 
    # List a single Application
    def show 
      app = Application.find_by(token: params[:token])
-     render json: app
+     chat = Chat.find_by(application_id: app.id, chatNumber: params[:chatNumber])
+     render json: chat
    end
  
  
@@ -20,6 +21,8 @@ class ChatController < ActionController::Base
     app = Application.find_by(token: params[:token])
     chatCount = Chat.where(:application_id => app.id).count
     @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount+1)
+    app.chatCount =1
+    app.save
     @newChat.save
     render json: @newChat
    end

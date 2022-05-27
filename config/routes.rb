@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   delete 'applications/:token', to: 'application#delete'
 
   get 'applications/:token/chats', to: 'chat#list'
+  get 'applications/:token/chats/:chatNumber', to: 'chat#show'
   post 'applications/:token/chats', to: 'chat#create'
 end
