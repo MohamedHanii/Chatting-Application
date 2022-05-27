@@ -21,7 +21,7 @@ class ChatController < ActionController::Base
     app = Application.find_by(token: params[:token])
     chatCount = Chat.where(:application_id => app.id).count
     @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount+1)
-    app.chatCount =1
+    app.chatCount += 1
     app.save
     @newChat.save
     render json: @newChat
@@ -31,15 +31,19 @@ class ChatController < ActionController::Base
    # Update Application
    def update
      app = Application.find_by(token: params[:token])
-     app.name = params[:name]
-     app.save
-     render json: app
+     chat = app.chats.find_by(id: params[:chatNumber])
+     chat.chatName = params[:name]
+     chat.save
+     render json: chat
    end
    
    #Delete Application
    def delete
      app = Application.find_by(token: params[:token])
-     app.destroy
+     chat = app.chats.find_by(id: params[:chatNumber])
+     app.chatCount-=1
+     app.save
+     chat.destroy
      render json: app
    end
  

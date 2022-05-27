@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   get 'applications/:token/chats', to: 'chat#list'
   get 'applications/:token/chats/:chatNumber', to: 'chat#show'
   post 'applications/:token/chats', to: 'chat#create'
+  put 'applications/:token/chats/:chatNumber', to: 'chat#update'
+  delete 'applications/:token/chats/:chatNumber', to: 'chat#delete'
 end
