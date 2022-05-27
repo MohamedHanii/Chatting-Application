@@ -31,7 +31,7 @@ class ChatController < ActionController::Base
    # Update Application
    def update
      app = Application.find_by(token: params[:token])
-     chat = app.chats.find_by(id: params[:chatNumber])
+     chat = app.chats.find_by(chatNumber: params[:chatNumber])
      chat.chatName = params[:name]
      chat.save
      render json: chat
@@ -40,7 +40,7 @@ class ChatController < ActionController::Base
    #Delete Application
    def delete
      app = Application.find_by(token: params[:token])
-     chat = app.chats.find_by(id: params[:chatNumber])
+     chat = app.chats.find_by(chatNumber: params[:chatNumber])
      app.chatCount-=1
      app.save
      chat.destroy
