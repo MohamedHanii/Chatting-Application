@@ -22,17 +22,17 @@ ActiveRecord::Schema.define(version: 20220526134323) do
 
   create_table "chats", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "chatName"
-    t.decimal  "chatNumber",   precision: 10
-    t.decimal  "messageCount", precision: 10
-    t.integer  "appId"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.decimal  "chatNumber",     precision: 10
+    t.decimal  "messageCount",   precision: 10
+    t.integer  "application_id"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "messages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string   "messageContent"
     t.decimal  "messageNumber",  precision: 10
-    t.integer  "chatId"
+    t.integer  "chat_id"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
   end

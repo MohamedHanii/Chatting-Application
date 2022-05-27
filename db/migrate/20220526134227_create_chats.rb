@@ -4,7 +4,7 @@ class CreateChats < ActiveRecord::Migration[5.0]
       t.string :chatName
       t.decimal :chatNumber
       t.decimal :messageCount
-      t.integer :appId
+      t.integer :application_id
 
       t.timestamps
     end
