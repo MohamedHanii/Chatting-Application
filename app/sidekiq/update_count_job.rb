@@ -3,9 +3,16 @@ class UpdateCountJob
 
   def perform(*args)
     puts 'Starting count job'
-    app = Application.find_by(token: '8ba43cefe0')
-    chatCount = Chat.where(:application_id => app.id).count
-    app.chatCount = chatCount
-    app.save
+    appIds = $redis.smembers('chat_counts')
+    appIds.each  do  |appId| 
+      curr = Application.find_by(id: appId)
+      curr.chatCount = $redis.get(appId)
+      curr.save
+
+    # app = Application.find_by(token: '033475831f')
+    # chatCount = Chat.where(:application_id => app.id).count
+    # app.chatCount = chatCount
+    # app.save
+    end
   end
 end
