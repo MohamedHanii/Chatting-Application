@@ -1,6 +1,11 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-
+  Rails.application.routes.draw do
+    mount Sidekiq::Web => '/sidekiq'
+  end
+  
   get 'applications', to: 'application#list'
   get 'applications/:token', to: 'application#show'
   post 'applications', to: 'application#create'

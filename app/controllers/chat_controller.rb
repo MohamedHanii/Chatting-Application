@@ -21,8 +21,8 @@ class ChatController < ActionController::Base
     app = Application.find_by(token: params[:token])
     chatCount = Chat.where(:application_id => app.id).count
     @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount+1)
-    app.chatCount += 1
-    app.save
+    #app.chatCount += 1
+    #app.save
     @newChat.save
     render json: @newChat
    end

@@ -1,0 +1,7 @@
+my_first_job:
+   cron: "*/5 * * * *"
+   class: "HardJob"
+
+my_second_job:
+   cron: "*/10 * * * *"
+   class: "UpdateCountJob"
