@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
 
   # List All Application
   def list
+    HomeJob.perform_later
    render json: Application.all
   end
 

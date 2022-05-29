@@ -53,8 +53,13 @@ GEM
     connection_pool (2.2.5)
     crass (1.0.6)
     erubis (2.7.0)
+    et-orbi (1.2.7)
+      tzinfo
     execjs (2.8.1)
     ffi (1.15.5)
+    fugit (1.5.3)
+      et-orbi (~> 1, >= 1.2.7)
+      raabro (~> 1.4)
     globalid (1.0.0)
       activesupport (>= 5.0)
     i18n (1.10.0)
@@ -82,6 +87,7 @@ GEM
     nokogiri (1.12.5-x86_64-linux)
       racc (~> 1.4)
     puma (3.12.6)
+    raabro (1.4.0)
     racc (1.6.0)
     rack (2.2.3)
     rack-test (0.6.3)
@@ -145,6 +151,9 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
+    sidekiq-cron (1.4.0)
+      fugit (~> 1)
+      sidekiq (>= 4.2.1)
     spring (2.1.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -190,6 +199,7 @@ DEPENDENCIES
   redis-rails
   sass-rails (~> 5.0)
   sidekiq
+  sidekiq-cron
   spring
   spring-watcher-listen (~> 2.0.0)
   turbolinks (~> 5)
