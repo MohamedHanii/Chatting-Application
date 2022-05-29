@@ -19,10 +19,21 @@ class ChatController < ActionController::Base
    #Create New Application
    def create 
     app = Application.find_by(token: params[:token])
-    chatCount = Chat.where(:application_id => app.id).count
-    @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount+1)
-    #app.chatCount += 1
-    #app.save
+    $redis.sadd("chat_counts",app.id);
+
+    if $redis.get(app.id)
+      # need to revert this if 
+      puts 'app.id found'
+    else
+      puts 'app.id found'
+      $redis.set(app.id,app.chatCount)
+    end
+
+    chatCount = $redis.incr(app.id)
+
+
+    @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount)
+
     @newChat.save
     render json: @newChat
    end

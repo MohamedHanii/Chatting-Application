@@ -23,6 +23,7 @@ gem 'coffee-rails', '~> 4.2'
 gem 'sidekiq'
 
 gem 'redis-rails'
+
 gem "sidekiq-cron"
 
 # Use jquery as the JavaScript library
