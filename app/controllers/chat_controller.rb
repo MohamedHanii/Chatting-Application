@@ -19,17 +19,17 @@ class ChatController < ActionController::Base
    #Create New Application
    def create 
     app = Application.find_by(token: params[:token])
-    $redis.sadd("chat_counts",app.id);
+    $redis.sadd("chat_counts",app.token);
 
-    if $redis.get(app.id)
+    if $redis.get(app.token)
       # need to revert this if 
       puts 'app.id found'
     else
       puts 'app.id found'
-      $redis.set(app.id,app.chatCount)
+      $redis.set(app.token,app.chatCount)
     end
 
-    chatCount = $redis.incr(app.id)
+    chatCount = $redis.incr(app.token)
 
 
     @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount)
@@ -51,9 +51,19 @@ class ChatController < ActionController::Base
    #Delete Application
    def delete
      app = Application.find_by(token: params[:token])
+     $redis.sadd("chat_counts",app.token);
+
+     if $redis.get(app.token)
+       # need to revert this if 
+       puts 'app.id found'
+     else
+       puts 'app.id found'
+       $redis.set(app.token,app.chatCount)
+     end
+     $redis.decr(app.token)
+
      chat = app.chats.find_by(chatNumber: params[:chatNumber])
-     app.chatCount-=1
-     app.save
+
      chat.destroy
      render json: app
    end
