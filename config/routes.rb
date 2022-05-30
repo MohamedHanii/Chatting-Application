@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
-  
+  get 'applications/messages/search', to: 'message#search'
+
   get 'applications', to: 'application#list'
   get 'applications/:token', to: 'application#show'
   post 'applications', to: 'application#create'
@@ -23,5 +24,5 @@ Rails.application.routes.draw do
   post 'applications/:token/chats/:chatNumber/messages', to: 'message#create'
   put 'applications/:token/chats/:chatNumber/messages/:messageNumber', to: 'message#update'
   delete 'applications/:token/chats/:chatNumber/messages/:messageNumber', to: 'message#delete'
-
+  
 end
