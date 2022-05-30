@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   # List All Application
   def list
-
+    # $redis.smembers('chat_counts')
    render json: Application.all
   end
 
@@ -41,5 +41,5 @@ class ApplicationController < ActionController::Base
     render json: app
   end
 
-
+  
 end
