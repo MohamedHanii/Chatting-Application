@@ -1,5 +1,0 @@
-development: &default
-  host: ‘http://elasticsearch:9200'
-  log: true
-
-discovery.type: single-node

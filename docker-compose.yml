@@ -15,6 +15,7 @@ services:
         
         ports:
         - "9200:9200"
+        - "9300:9300"
         ulimits:
             memlock:
                 soft: -1
@@ -26,8 +27,11 @@ services:
         environment:
             - xpack.security.enabled=false
             - discovery.type=single-node
+            - ES_HOST=es
+        cap_add:
+            - IPC_LOCK
         volumes:
-        - .:/usr/share/elasticsearch/data
+            - elasticsearch-data:/usr/share/elasticsearch/data
     redis:
         image: 'redis:5-alpine'
         command: redis-server
@@ -56,6 +60,8 @@ services:
             REDIS_HOST: redis
             REDIS_PORT: 6379
             REDIS_URL: redis://localhost:6379/1
+            ES_HOST: es
+            ELASTIC_PORT: "9200"
     sidekiq:
         build: .
         command: bundle exec sidekiq
@@ -75,3 +81,6 @@ services:
         links:
             - db
             - redis
+volumes:
+  elasticsearch-data:
+    driver: local

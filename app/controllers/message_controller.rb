@@ -20,6 +20,8 @@ class MessageController < ActionController::Base
   skip_before_action :verify_authenticity_token
    #Create New Application
    def create 
+    #  query = params[:content]
+    #  @message = Message.search_content(query)
     app = Application.find_by(token: params[:token])
     chat = app.chats.find_by(chatNumber: params[:chatNumber])
 
@@ -38,6 +40,8 @@ class MessageController < ActionController::Base
 
     @newMessage.save
     render json: @newMessage
+
+    # render json: @message
    end
  
    
@@ -70,4 +74,10 @@ class MessageController < ActionController::Base
     message.destroy
     render json: chat
    end
+
+   def search
+    @results = Message.search(params[:query]) unless params[:query].blank?
+    render json: @results.map{|value| value.as_json["_source"]}
+   end
+
 end
