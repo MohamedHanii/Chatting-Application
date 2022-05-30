@@ -3,16 +3,27 @@ class UpdateCountJob
 
   def perform(*args)
     puts 'Starting count job'
-    appIds = $redis.smembers('chat_counts')
-    appIds.each  do  |appId| 
-      curr = Application.find_by(id: appId)
-      curr.chatCount = $redis.get(appId)
-      curr.save
+    puts $redis.smembers('chat_counts')
+    appTokens = $redis.smembers('chat_counts')
+    appTokens.each  do  |token| 
+      curr = Application.find_by(token: token)
+      if curr
+        curr.chatCount = $redis.get(token)
+        curr.save
+      end
+      $redis.srem('chat_counts',token)
+    end
 
-    # app = Application.find_by(token: '033475831f')
-    # chatCount = Chat.where(:application_id => app.id).count
-    # app.chatCount = chatCount
-    # app.save
+    puts 'Updating messages'
+    puts $redis.smembers('message_counts')
+    chatIds = $redis.smembers('message_counts')
+    chatIds.each  do  |chatId| 
+      currChat = Chat.find_by(id: chatId)
+      if currChat
+        currChat.messageCount = $redis.get(chatId)
+        currChat.save
+      end
+      $redis.srem('message_counts',chatId)
     end
   end
 end

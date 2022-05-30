@@ -22,10 +22,20 @@ class MessageController < ActionController::Base
    def create 
     app = Application.find_by(token: params[:token])
     chat = app.chats.find_by(chatNumber: params[:chatNumber])
-    messageCount = Message.where(:chat_id => chat.id).count
-    @newMessage = chat.messages.build(messageContent: params[:message], messageNumber: messageCount+1)
-    chat.messageCount += 1
-    chat.save
+
+    $redis.sadd("message_counts",chat.id);
+
+    if $redis.get(chat.id)
+      # need to revert this if 
+      puts 'app.id found'
+    else
+      puts 'app.id found'
+      $redis.set(chat.id,chat.messageCount)
+    end
+
+    messageCount = $redis.incr(chat.id)
+    @newMessage = chat.messages.build(messageContent: params[:message], messageNumber: messageCount)
+
     @newMessage.save
     render json: @newMessage
    end
@@ -46,8 +56,17 @@ class MessageController < ActionController::Base
     app = Application.find_by(token: params[:token])
     chat = app.chats.find_by(chatNumber: params[:chatNumber])
     message = chat.messages.find_by(messageNumber: params[:messageNumber])
-    chat.messageCount-=1
-    chat.save
+    $redis.sadd("message_counts",chat.id);
+
+    if $redis.get(chat.id)
+      # need to revert this if 
+      puts 'app.id found'
+    else
+      puts 'app.id found'
+      $redis.set(chat.id,chat.messageCount)
+    end
+    $redis.decr(chat.id)
+
     message.destroy
     render json: chat
    end
