@@ -26,7 +26,8 @@ gem 'redis-rails'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 gem "sidekiq-cron"
-
+gem 'bunny'
+gem 'sneakers'
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
