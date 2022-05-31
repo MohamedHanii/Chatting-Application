@@ -10,9 +10,31 @@ services:
             MYSQL_PASSWORD: password
         ports:
             - "3307:3306"
+    sidekiq:
+        build: .
+        command: bundle exec sidekiq
+        volumes:
+          - .:/app
+        environment:
+            DB_USER: root
+            DB_NAME: app
+            DB_PASSWORD: password
+            DB_HOST: db
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+            REDIS_URL: redis
+            ES_HOST: es
+            ELASTIC_PORT: 9200
+        depends_on:
+            - redis
+            - db
+            - es
+        links:
+            - db
+            - redis
+            - es
     es:
         image: elasticsearch:8.2.0
-        
         ports:
         - "9200:9200"
         - "9300:9300"
@@ -62,25 +84,7 @@ services:
             REDIS_URL: redis://localhost:6379/1
             ES_HOST: es
             ELASTIC_PORT: "9200"
-    sidekiq:
-        build: .
-        command: bundle exec sidekiq
-        volumes:
-          - .:/app
-        environment:
-            DB_USER: root
-            DB_NAME: app
-            DB_PASSWORD: password
-            DB_HOST: db
-            REDIS_HOST: redis
-            REDIS_PORT: 6379
-            REDIS_URL: redis
-        depends_on:
-            - redis
-            - db
-        links:
-            - db
-            - redis
+
 volumes:
   elasticsearch-data:
     driver: local
