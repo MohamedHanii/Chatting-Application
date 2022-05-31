@@ -1,85 +1,76 @@
 class MessageController < ActionController::Base
-    protect_from_forgery with: :exception
+  before_action :set_chat
 
-    # List All Application
+    # list all Messages
+    # GET /api/v1/applications/:token/chats/:chatNumber/messages
     def list
-        app = Application.find_by(token: params[:token])
-        chat = app.chats.find_by(chatNumber: params[:chatNumber])
-        render json: chat.messages.all
+        json_render(@chat.messages.all)
     end
 
-   # List a single Application
-   def show 
-    app = Application.find_by(token: params[:token])
-    chat = app.chats.find_by(chatNumber: params[:chatNumber])
-    message = chat.messages.find_by(messageNumber: params[:messageNumber])
-    render json: message
-   end
+  # Show Specific Message
+  # GET /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber
+  def show 
+    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
+    json_render(message)
+  end
  
  
-  skip_before_action :verify_authenticity_token
-   #Create New Application
+   # Create New Message
+   # POST /api/v1/applications/:token/chats/:chatNumber/messages
    def create 
-    #  query = params[:content]
-    #  @message = Message.search_content(query)
-    app = Application.find_by(token: params[:token])
-    chat = app.chats.find_by(chatNumber: params[:chatNumber])
-
-    $redis.sadd("message_counts",chat.id);
-
-    if $redis.get(chat.id)
-      # need to revert this if 
-      puts 'app.id found'
-    else
-      puts 'app.id found'
-      $redis.set(chat.id,chat.messageCount)
-    end
-
-    messageCount = $redis.incr(chat.id)
-    @newMessage = chat.messages.build(messageContent: params[:message], messageNumber: messageCount)
-    
+    messageCount = incr_count(@chat)
+    @newMessage = @chat.messages.build(messageContent: params[:message], messageNumber: messageCount)
     DbActionWorker.perform_async('Message',@newMessage.to_json)
-
-    #@newMessage.save
-    render json: @newMessage
-
-    # render json: @message
+    json_render(@newMessage)
    end
  
    
-   # Update Application
+   # Update Message
+   # PUT /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber
    def update
-    app = Application.find_by(token: params[:token])
-    chat = app.chats.find_by(chatNumber: params[:chatNumber])
-    message = chat.messages.find_by(messageNumber: params[:messageNumber])
+    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
     message.messageContent = params[:content]
     message.save
-    render json: message
+    json_render(message)
    end
    
    #Delete Application 
-   def delete
-    app = Application.find_by(token: params[:token])
-    chat = app.chats.find_by(chatNumber: params[:chatNumber])
-    message = chat.messages.find_by(messageNumber: params[:messageNumber])
-    $redis.sadd("message_counts",chat.id);
-
-    if $redis.get(chat.id)
-      # need to revert this if 
-      puts 'app.id found'
-    else
-      puts 'app.id found'
-      $redis.set(chat.id,chat.messageCount)
-    end
-    $redis.decr(chat.id)
-
+   def destroy
+    messageCount = decr_count(@chat)
+    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
     message.destroy
-    render json: chat
+    json_render(@chat)
    end
 
    def search
     @results = Message.search(params[:query]) unless params[:query].blank?
     render json: @results.map{|value| value.as_json["_source"]}
    end
+
+
+   private
+
+   def set_chat 
+     @app = Application.find_by(token: params[:token]) 
+     if @app
+      @chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+     end
+   end
+ 
+   def json_render(reply)
+     render json: reply.as_json(:except => :id)
+   end
+
+   def incr_count(chat)
+    $redis.sadd("message_counts",chat.id);
+    $redis.set(chat.id,chat.messageCount) unless $redis.get(chat.id)
+    chatCount = $redis.incr(chat.id)
+  end
+
+  def decr_count(chat)
+    $redis.sadd("message_counts",chat.id);
+    $redis.set(chat.id,chat.messageCount) unless $redis.get(chat.id)
+    chatCount = $redis.decr(chat.id)
+  end
 
 end

@@ -1,73 +1,69 @@
 class ChatController < ActionController::Base
-  protect_from_forgery with: :exception
+  before_action :set_app
 
-    # List All Application
+    # List All Chats for Application
+    # GET api/v1/applications/:token/chats
     def list
-        app = Application.find_by(token: params[:token])
-        render json: app.chats.all
+      json_render(@app.chats.all)
     end
 
-   # List a single Application
+   # List a single specific Chat inside application
+   # GET api/v1/applications/:token/chats/:chatNumber
    def show 
-     app = Application.find_by(token: params[:token])
-     chat = Chat.find_by(application_id: app.id, chatNumber: params[:chatNumber])
-     render json: chat
+    chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+    json_render(chat)
    end
  
  
-  skip_before_action :verify_authenticity_token
-   #Create New Application
+   # Create New Chat
+   # POST api/v1/applications/:token/chats
    def create 
-    app = Application.find_by(token: params[:token])
-    $redis.sadd("chat_counts",app.token);
-
-    if $redis.get(app.token)
-      # need to revert this if 
-      puts 'app.id found'
-    else
-      puts 'app.id found'
-      $redis.set(app.token,app.chatCount)
-    end
-
-    chatCount = $redis.incr(app.token)
-
-
-    @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount)
-
+    chatCount = incr_count(@app)
+    @newChat = @app.chats.build(chatName: params[:name], chatNumber: chatCount)
     DbActionWorker.perform_async('Chat',@newChat.to_json)
-
-    render json: @newChat
+    json_render(@newChat)
    end
  
    
-   # Update Application
+   # Update Chat
+   # PUT api/v1/applications/:token/chats/:chatNunber
    def update
-     app = Application.find_by(token: params[:token])
-     chat = app.chats.find_by(chatNumber: params[:chatNumber])
+     chat = @app.chats.find_by(chatNumber: params[:chatNumber])
      chat.chatName = params[:name]
      chat.save
-     render json: chat
+     json_render(chat)
    end
    
-   #Delete Application
-   def delete
-     app = Application.find_by(token: params[:token])
-     $redis.sadd("chat_counts",app.token);
-
-     if $redis.get(app.token)
-       # need to revert this if 
-       puts 'app.id found'
-     else
-       puts 'app.id found'
-       $redis.set(app.token,app.chatCount)
-     end
-     $redis.decr(app.token)
-
-     chat = app.chats.find_by(chatNumber: params[:chatNumber])
-
+   # Update Chat
+   # DELETE api/v1/applications/:token/chats/:chatNunber
+   def destroy
+     chatCount = decr_count(@app)
+     chat = @app.chats.find_by(chatNumber: params[:chatNumber])
      chat.destroy
-     render json: app
+     json_render(@app)
    end
  
  
+  private
+
+  def set_app 
+    @app = Application.find_by(token: params[:token])
+  end
+
+  def json_render(reply)
+    render json: reply.as_json(:except => :id)
+  end
+
+  def incr_count(app)
+    $redis.sadd("chat_counts",app.token);
+    $redis.set(app.token,app.chatCount) unless $redis.get(app.token)
+    chatCount = $redis.incr(app.token)
+  end
+
+  def decr_count(app)
+    $redis.sadd("chat_counts",app.token);
+    $redis.set(app.token,app.chatCount) unless $redis.get(app.token)
+    chatCount = $redis.decr(app.token)
+  end
+  
 end

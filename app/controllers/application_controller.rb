@@ -1,45 +1,61 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery with: :exception
+  before_action :set_app, only: [:show,:update, :destroy]
 
-  # List All Application
+  # list all applications
+  #GET /api/v1/applications
   def list
-    # $redis.smembers('chat_counts')
-   render json: Application.all
+    apps = Application.all
+    json_render(apps)
   end
 
-  # List a single Application
+  #Show specific application
+  #GET /api/v1/applications/:token
   def show 
-    app = Application.find_by(token: params[:token])
-    render json: app
+    json_render(@app)
   end
 
-
-  skip_before_action :verify_authenticity_token
-  #Create New Application
+  #Create Application
+  #POST /api/v1/applications
   def create 
+    # Create Token
     loop do
-      @unique_identifier = SecureRandom.hex(5) # or whatever you chose like UUID tools
+      @unique_identifier = SecureRandom.hex(8)
       break unless Application.exists?(:token => @unique_identifier)
     end
+    
     app = Application.create(name: params[:name], token: @unique_identifier)
-    render json: app
+    json_render(app)
   end
 
-  
-  # Update Application
+  #Update Application with Token
+  #PUT /api/v1/applications/:token
   def update
-    app = Application.find_by(token: params[:token])
-    app.name = params[:name]
-    app.save
-    render json: app
+    if @app
+      @app.name = params[:name]
+      @app.save
+    end
+    json_render(@app)
   end
   
-  #Delete Application
-  def delete
-    app = Application.find_by(token: params[:token])
-    app.destroy
-    render json: app
+  # Delete Application with Token
+  #DELETE /api/v1/applications/:token
+  def destroy
+    if @app
+      @app.destroy
+    end
+    json_render(@app)
   end
+
+  private 
+
+  def set_app 
+    @app = Application.find_by(token: params[:token]) || 'Token not found'
+  end
+
+  def json_render(reply)
+    render json: reply.as_json(:except => :id)
+  end
+
 
   
 end
