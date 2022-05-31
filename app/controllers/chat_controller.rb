@@ -34,7 +34,8 @@ class ChatController < ActionController::Base
 
     @newChat = app.chats.build(chatName: params[:name], chatNumber: chatCount)
 
-    @newChat.save
+    DbActionWorker.perform_async('Chat',@newChat.to_json)
+
     render json: @newChat
    end
  

@@ -38,7 +38,8 @@ class MessageController < ActionController::Base
     messageCount = $redis.incr(chat.id)
     @newMessage = chat.messages.build(messageContent: params[:message], messageNumber: messageCount)
 
-    @newMessage.save
+    DbActionWorker.perform_async('Message',@newMessage.to_json)
+
     render json: @newMessage
 
     # render json: @message
