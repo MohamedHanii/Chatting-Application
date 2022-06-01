@@ -1,9 +1,9 @@
-class ApplicationController < ActionController::Base
+class ApplicationsController < ActionController::Base
   before_action :set_app, only: [:show,:update, :destroy]
 
   # list all applications
   #GET /api/v1/applications
-  def list
+  def index
     apps = Application.all
     json_render(apps)
   end
@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   #Show specific application
   #GET /api/v1/applications/:token
   def show 
+    puts "HEELOO"
     json_render(@app)
   end
 
@@ -49,8 +50,10 @@ class ApplicationController < ActionController::Base
   private 
 
   def set_app 
+    puts params
     @app = Application.find_by(token: params[:token]) || 'Token not found'
   end
+
 
   def json_render(reply)
     render json: reply.as_json(:except => :id)
