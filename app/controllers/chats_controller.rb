@@ -1,16 +1,16 @@
-class ChatController < ActionController::Base
+class ChatsController < ActionController::Base
   before_action :set_app
 
     # List All Chats for Application
     # GET api/v1/applications/:token/chats
-    def list
+    def index
       json_render(@app.chats.all)
     end
 
    # List a single specific Chat inside application
    # GET api/v1/applications/:token/chats/:chatNumber
    def show 
-    chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+    chat = @app.chats.find_by(chatNumber: params[:chat_number])
     json_render(chat)
    end
  
@@ -28,7 +28,7 @@ class ChatController < ActionController::Base
    # Update Chat
    # PUT api/v1/applications/:token/chats/:chatNunber
    def update
-     chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+     chat = @app.chats.find_by(chatNumber: params[:chat_number])
      chat.chatName = params[:name]
      chat.save
      json_render(chat)
@@ -38,7 +38,7 @@ class ChatController < ActionController::Base
    # DELETE api/v1/applications/:token/chats/:chatNunber
    def destroy
      chatCount = decr_count(@app)
-     chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+     chat = @app.chats.find_by(chatNumber: params[:chat_number])
      chat.destroy
      json_render(@app)
    end
@@ -47,11 +47,12 @@ class ChatController < ActionController::Base
   private
 
   def set_app 
-    @app = Application.find_by(token: params[:token])
+    @app = Application.find_by(token: params[:application_token])
   end
 
   def json_render(reply)
-    render json: reply.as_json(:except => :id)
+    puts params
+    render json: reply.as_json(:except => [:id, :application_id])
   end
 
   def incr_count(app)

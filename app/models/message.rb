@@ -14,14 +14,14 @@ class Message < ApplicationRecord
           query: {
             query_string: {
               query:'*' + query + '*',
-              fields: ['messageContent']
+              fields: ['messageContent', ]
             }
           }
         )
       end
 
       def as_indexed_json(_options = nil)
-        as_json(only: [:messageContent])
+        as_json(only: [:messageContent, :messageNumber])
       end
     
 end

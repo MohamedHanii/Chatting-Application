@@ -1,16 +1,16 @@
-class MessageController < ActionController::Base
+class MessagesController < ActionController::Base
   before_action :set_chat
 
     # list all Messages
     # GET /api/v1/applications/:token/chats/:chatNumber/messages
-    def list
+    def index
         json_render(@chat.messages.all)
     end
 
   # Show Specific Message
   # GET /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber
   def show 
-    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
+    message = @chat.messages.find_by(messageNumber: params[:message_number])
     json_render(message)
   end
  
@@ -28,20 +28,21 @@ class MessageController < ActionController::Base
    # Update Message
    # PUT /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber
    def update
-    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
+    message = @chat.messages.find_by(messageNumber: params[:message_number])
     message.messageContent = params[:content]
     message.save
     json_render(message)
    end
    
-   #Delete Application 
+   #Delete Message 
    def destroy
     messageCount = decr_count(@chat)
-    message = @chat.messages.find_by(messageNumber: params[:messageNumber])
+    message = @chat.messages.find_by(messageNumber: params[:message_number])
     message.destroy
     json_render(@chat)
    end
 
+   #Search for part or full message
    def search
     @results = Message.search(params[:query]) unless params[:query].blank?
     render json: @results.map{|value| value.as_json["_source"]}
@@ -51,14 +52,15 @@ class MessageController < ActionController::Base
    private
 
    def set_chat 
-     @app = Application.find_by(token: params[:token]) 
+    puts params
+     @app = Application.find_by(token: params[:application_token]) 
      if @app
-      @chat = @app.chats.find_by(chatNumber: params[:chatNumber])
+      @chat = @app.chats.find_by(chatNumber: params[:chat_chat_number])
      end
    end
  
    def json_render(reply)
-     render json: reply.as_json(:except => :id)
+     render json: reply.as_json(:except => [:id, :chat_id])
    end
 
    def incr_count(chat)
