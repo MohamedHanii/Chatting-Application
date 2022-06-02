@@ -12,8 +12,9 @@ Client can search through messages of a specific chat. they are able to partiall
 
 
 ## Application Setup Instructions
----------
-You need only docker for setup the application [Docker][https://docs.docker.com/engine/install/ubuntu/]
+-------
+
+You need only docker for setup the application [Docker](https://docs.docker.com/engine/install/ubuntu/)
 
 After installing docker you can write thses commands to run the application
 
@@ -31,6 +32,45 @@ cd Chatting-Application
 sudo docker-compose up
 ```
 ## Database Design
+The application have 3 tables: Applications, Chats, Messages with 1-M Relationship between Applications and Chats and 1-M Relationship between Chats and Messages
+
+**Applications Table**
+
+| Field      | Type             | Null  | Key   | Default | Extra          |
+| -----------|:----------------:| -----:| -----:| -------:| --------------:|
+| id         | int(11)          | NO    | PRI   | NULL    | auto_increment |
+| token      | varchar(255)     | YES   |       | NULL    |                |
+| name       | varchar(255)     | YES   |       | NULL    |                |
+| chatCount  | decimal(10,0)    | YES   |       | 0       |                |
+| created_at | datetime         | NO    |       | NULL    |                |
+| updated_at | datetime         | NO    |       | NULL    |                |
+
+
+**Chats Table**
+
+| Field          | Type          | Null  | Key  | Default | Extra          |
+| ---------------|:-------------:| -----:| ----:| -------:| --------------:|
+| id             | int(11)       | NO   | PRI   | NULL    | auto_increment |
+| chatName       | varchar(255)  | YES  |       | NULL    |                |
+| chatNumber     | decimal(10,0) | YES  |       | NULL    |                |
+| messageCount   | decimal(10,0) | YES  |       | 0       |                |
+| application_id | int(11)       | YES  |       | NULL    |                |
+| created_at     | datetime      | NO   |       | NULL    |                |
+| updated_at     | datetime      | NO   |       | NULL    |                |
+
+
+**Messages Table**
+
+| Field          | Type             | Null  | Key | Default | Extra          |
+| ---------------|:----------------:| -----:| ---:| -------:| --------------:|
+| id             | int(11)          | NO    | PRI | NULL    | auto_increment |
+| messageContent | varchar(255)     | YES   |     | NULL    |                |
+| messageNumber  | decimal(10,0)    | YES   |     | NULL    |                |
+| chat_id        | int(11)          | YES   |     | NULL    |                |
+| created_at     | datetime         | NO    |     | NULL    |                |
+| updated_at     | datetime         | NO    |     | NULL    |                |
+
+
 
 ## Immplmentation
 
@@ -254,7 +294,7 @@ response:
 ]
 ```
 
-**Get Specific Message using application token and chat number and message number ** 
+**Get Specific Message using application token and chat number and message number** 
 
 [GET /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber]
 
