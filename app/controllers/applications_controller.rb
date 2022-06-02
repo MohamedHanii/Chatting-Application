@@ -11,7 +11,6 @@ class ApplicationsController < ActionController::Base
   #Show specific application
   #GET /api/v1/applications/:token
   def show 
-    puts "HEELOO"
     json_render(@app)
   end
 
