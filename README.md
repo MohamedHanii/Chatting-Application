@@ -12,7 +12,6 @@ Client can search through messages of a specific chat. they are able to partiall
 
 
 ## Application Setup Instructions
--------
 
 You need only docker for setup the application [Docker](https://docs.docker.com/engine/install/ubuntu/)
 
@@ -29,7 +28,7 @@ Running Application
 ```
 cd Chatting-Application
 
-sudo docker-compose up
+sudo docker-compose up --build
 ```
 ## Database Design
 The application have 3 tables: Applications, Chats, Messages with 1-M Relationship between Applications and Chats and 1-M Relationship between Chats and Messages
@@ -37,7 +36,7 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 **Applications Table**
 
 | Field      | Type             | Null  | Key   | Default | Extra          |
-| -----------|:----------------:| -----:| -----:| -------:| --------------:|
+| -----------|:-----------------| ------| ------| --------| ---------------|
 | id         | int(11)          | NO    | PRI   | NULL    | auto_increment |
 | token      | varchar(255)     | YES   |       | NULL    |                |
 | name       | varchar(255)     | YES   |       | NULL    |                |
@@ -48,8 +47,8 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 
 **Chats Table**
 
-| Field          | Type          | Null  | Key  | Default | Extra          |
-| ---------------|:-------------:| -----:| ----:| -------:| --------------:|
+| Field          | Type          | Null | Key   | Default | Extra          |
+| ---------------|---------------| -----| ----  | --------| ---------------|
 | id             | int(11)       | NO   | PRI   | NULL    | auto_increment |
 | chatName       | varchar(255)  | YES  |       | NULL    |                |
 | chatNumber     | decimal(10,0) | YES  |       | NULL    |                |
@@ -62,7 +61,7 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 **Messages Table**
 
 | Field          | Type             | Null  | Key | Default | Extra          |
-| ---------------|:----------------:| -----:| ---:| -------:| --------------:|
+| ---------------|:-----------------| ------| ----| --------| ---------------|
 | id             | int(11)          | NO    | PRI | NULL    | auto_increment |
 | messageContent | varchar(255)     | YES   |     | NULL    |                |
 | messageNumber  | decimal(10,0)    | YES   |     | NULL    |                |
@@ -74,8 +73,23 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 
 ## Immplmentation
 
+As first, i started with created dockerfile and docker-compose file which have the following containers:
+* db        --> MYSQL
+* sidekiq   --> Queue System
+* es        --> Elastic Search
+* redis     --> In Memory database (Redis)
+* app       --> Ruby on Rails
+
+The API implemenetd using Rails V5 along with MYSQL as database while having Redis as in memory database for keeping track of the counts of chats and messages created.
+
+Using Sidekiq as job scheduler to run sidekiq job every 15 mints to update the chats and message counts that storge in Redis, also used Sidekiq as Queue System to avoid avoid writing directly to MySQL while serving the requests(especially for the chats and messages creation endpoints).
+
+Using Elastic Search to be able to search among messages with a given keyword (Partial matching). 
+
+
+
 ## API Endpoints
----------
+
 API is running and listening on port 3001
 
 ### Application Endpoints
