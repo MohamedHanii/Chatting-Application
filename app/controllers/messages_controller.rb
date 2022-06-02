@@ -29,7 +29,7 @@ class MessagesController < ActionController::Base
    # PUT /api/v1/applications/:token/chats/:chatNumber/messages/:messageNumber
    def update
     message = @chat.messages.find_by(messageNumber: params[:message_number])
-    message.messageContent = params[:content]
+    message.messageContent = params[:message]
     message.save
     json_render(message)
    end
