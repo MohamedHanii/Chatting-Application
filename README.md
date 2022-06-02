@@ -11,7 +11,26 @@ its number along with the application token.
 Client can search through messages of a specific chat. they are able to partially match messages’ bodies.
 
 
-## Application Setup
+## Application Setup Instructions
+---------------------------------------------------------------------
+You need only docker for setup the application [Docker][https://docs.docker.com/engine/install/ubuntu/]
 
-You need only docker for setup the application
-[https://docs.docker.com/engine/install/ubuntu/]
+After installing docker you can write thses commands to run the application
+
+Clone Repository
+
+```
+git clone https://github.com/MohamedHanii/Chatting-Application.git
+```
+
+Running Application
+
+```
+cd Chatting-Application
+
+sudo docker-compose up
+```
+
+## API Endpoints
+-----------------------------------
+
