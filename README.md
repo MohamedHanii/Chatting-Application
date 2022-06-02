@@ -12,7 +12,7 @@ Client can search through messages of a specific chat. they are able to partiall
 
 
 ## Application Setup Instructions
----------------------------------------------------------------------
+--------------
 You need only docker for setup the application [Docker][https://docs.docker.com/engine/install/ubuntu/]
 
 After installing docker you can write thses commands to run the application
@@ -30,7 +30,113 @@ cd Chatting-Application
 
 sudo docker-compose up
 ```
+## Database Design
+
+## Immplmentation
 
 ## API Endpoints
------------------------------------
+---------
+API is running and listening on port 3001
 
+### Application Endpoints
+Get all Application   [GET /api/v1/applications]
+
+```
+curl -X GET  http://localhost:3001/api/v1/applications
+```
+
+response:
+
+```
+[
+    {
+        "token": "2b579d089f",
+        "name": "test application",
+        "chatCount": 1,
+        "created_at": "2022-05-30T13:27:03.000Z",
+        "updated_at": "2022-05-30T13:59:04.000Z"
+    },
+    {
+        "token": "bf572e5acd26bc9c",
+        "name": "test application#2",
+        "chatCount": 0,
+        "created_at": "2022-05-31T13:36:36.000Z",
+        "updated_at": "2022-05-31T13:36:36.000Z"
+    }
+]
+```
+
+Get Specific application using application token [GET /api/v1/applications/:token]
+
+```
+ curl -X GET  http://localhost:3001/api/v1/applications/bf572e5acd26bc9c
+```
+
+response: 
+
+```
+{
+    "token": "bf572e5acd26bc9c",
+    "name": "test application#2",
+    "chatCount": 0,
+    "created_at": "2022-05-31T13:36:36.000Z",
+    "updated_at": "2022-05-31T13:36:36.000Z"
+}
+```
+
+Create new application POST /api/v1/applications [POST /api/v1/applications]
+
+```
+curl -X POST  http://localhost:3001/api/v1/applications?name=test-application
+```
+
+response:
+
+```
+{
+  "token":"d42ad2ff1955ebe6",
+  "name":"test-application",
+  "chatCount":0,
+  "created_at":"2022-06-02T08:57:21.000Z",
+  "updated_at":"2022-06-02T08:57:21.000Z"
+ }
+```
+
+Update Application using token /api/v1/applications/:token [PUT /api/v1/applications/:token]
+
+```
+curl -X PUT  http://localhost:3001/api/v1/applications/d42ad2ff1955ebe6?name=updated-application
+```
+
+response:
+
+```
+{
+  "name": "updated-application",
+  "token": "d42ad2ff1955ebe6",
+  "chatCount": 0,
+  "created_at": "2022-06-02T08:57:21.000Z",
+  "updated_at": "2022-06-02T09:00:14.000Z"
+}
+```
+
+Delete Application using token /api/v1/applications/:token [DELETE /api/v1/applications/:token]
+
+```
+curl -X DELETE  http://localhost:3001/api/v1/applications/d42ad2ff1955ebe6
+```
+
+response:
+
+```
+{
+  "token": "d42ad2ff1955ebe6",
+  "name": "updated-application",
+  "chatCount": 0,
+  "created_at": "2022-06-02T08:57:21.000Z",
+  "updated_at": "2022-06-02T09:00:14.000Z"
+}
+```
+
+## Future Work
+ 
