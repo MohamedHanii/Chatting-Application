@@ -10,34 +10,9 @@ services:
             MYSQL_PASSWORD: password
         ports:
             - "3307:3306"
-    redis:
-        image: 'redis:5-alpine'
-        command: redis-server
-        ports:
-          - '6379:6379'
-    app: 
-        build: .
-        command: bundle exec rails s -p 3000 -b '0.0.0.0'
-        volumes: 
-            - ".:/app"
-        ports: 
-            - "3001:3000"
-        depends_on:
-            - db
-            - redis
-        links:
-            - db
-            - redis
-        environment:
-            DB_USER: root
-            DB_NAME: app
-            DB_PASSWORD: password
-            DB_HOST: db
-            REDIS_HOST: redis
-            REDIS_PORT: 6379
-            REDIS_URL: redis://localhost:6379/1
     sidekiq:
         build: .
+        restart: on-failure
         command: bundle exec sidekiq
         volumes:
           - .:/app
@@ -49,9 +24,70 @@ services:
             REDIS_HOST: redis
             REDIS_PORT: 6379
             REDIS_URL: redis
+            ES_HOST: es
+            ELASTIC_PORT: 9200
         depends_on:
             - redis
             - db
+            - es
         links:
             - db
             - redis
+            - es
+    es:
+        image: elasticsearch:8.2.0
+        restart: on-failure
+        ports:
+        - "9200:9200"
+        - "9300:9300"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        mem_limit: 1g
+        environment:
+            - xpack.security.enabled=false
+            - discovery.type=single-node
+            - ES_HOST=es
+        cap_add:
+            - IPC_LOCK
+        volumes:
+            - elasticsearch-data:/usr/share/elasticsearch/data
+    redis:
+        image: 'redis:5-alpine'
+        command: redis-server
+        ports:
+          - '6379:6379'
+    app: 
+        build: .
+        restart: on-failure
+        command: bash -c "sh wait-for-it.sh es:9200 && sh setup.sh"
+        volumes: 
+            - ".:/app"
+        ports: 
+            - "3001:3000"
+        depends_on:
+            - db
+            - redis
+            - es
+        links:
+            - db
+            - redis
+            - es
+        environment:
+            DB_USER: root
+            DB_NAME: app
+            DB_PASSWORD: password
+            DB_HOST: db
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+            REDIS_URL: redis://localhost:6379/1
+            ES_HOST: es
+            ELASTIC_PORT: "9200"
+
+volumes:
+  elasticsearch-data:
+    driver: local
