@@ -36,7 +36,7 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 **Applications Table**
 
 | Field      | Type             | Null  | Key   | Default | Extra          |
-| -----------|:-----------------| ------| ------| --------| ---------------|
+|:-----------|:-----------------|:------|:------|:--------|:---------------|
 | id         | int(11)          | NO    | PRI   | NULL    | auto_increment |
 | token      | varchar(255)     | YES   |       | NULL    |                |
 | name       | varchar(255)     | YES   |       | NULL    |                |
@@ -48,7 +48,7 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 **Chats Table**
 
 | Field          | Type          | Null | Key   | Default | Extra          |
-| ---------------|---------------| -----| ----  | --------| ---------------|
+|:---------------|:--------------|:-----|:------|:--------|:---------------|
 | id             | int(11)       | NO   | PRI   | NULL    | auto_increment |
 | chatName       | varchar(255)  | YES  |       | NULL    |                |
 | chatNumber     | decimal(10,0) | YES  |       | NULL    |                |
@@ -61,7 +61,7 @@ The application have 3 tables: Applications, Chats, Messages with 1-M Relationsh
 **Messages Table**
 
 | Field          | Type             | Null  | Key | Default | Extra          |
-| ---------------|:-----------------| ------| ----| --------| ---------------|
+|:---------------|:-----------------|:------|:----|:--------|:---------------|
 | id             | int(11)          | NO    | PRI | NULL    | auto_increment |
 | messageContent | varchar(255)     | YES   |     | NULL    |                |
 | messageNumber  | decimal(10,0)    | YES   |     | NULL    |                |
@@ -365,7 +365,30 @@ response:
 }
 ```
 
+**Search Through Messages** 
+[GET /api/v1/applications/messages/search?query=]
 
+```
+curl -X GET  http://localhost:3001/api/v1/applications/messages/search?query=New
+```
+
+response:
+
+```
+[
+  {
+    "messageContent": " New Message",
+    "messageNumber": 3
+  },
+  {
+    "messageContent": " New Created Message",
+    "messageNumber": 4
+  }
+]
+```
 
 ## Future Work
+
+* Create the endpoints of chats and messages creation as a Golang app.
+* Use RabbitMQ as queuing system instead of Sidekiq.
  
